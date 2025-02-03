@@ -8,6 +8,12 @@
 #include <Psapi.h>
 #include "StringUtils.h"
 
+#ifdef _WIN64
+#define CLASSIC_EXPLORER_MODULE L"ClassicExplorer64.dll"
+#else
+#define CLASSIC_EXPLORER_MODULE L"ClassicExplorer32.dll"
+#endif
+
 // Find and activate the Settings window
 static BOOL CALLBACK FindSettingsEnum( HWND hwnd, LPARAM lParam )
 {
@@ -34,13 +40,13 @@ static BOOL CALLBACK FindSettingsEnum( HWND hwnd, LPARAM lParam )
 	return !bFound;
 }
 
-HMODULE LoadClassicExplorerDll( void )
+HMODULE LoadClassicExplorerDll()
 {
-	wchar_t path[_MAX_PATH];
-	GetModuleFileName(NULL,path,_countof(path));
-	*PathFindFileName(path)=0;
-	PathAppend(path,L"ClassicExplorer32.dll");
-	return LoadLibrary(path);
+	WCHAR szPath[_MAX_PATH];
+	GetModuleFileName(NULL, szPath, _countof(szPath));
+	*PathFindFileName(szPath) = 0;
+	PathAppend(szPath, CLASSIC_EXPLORER_MODULE);
+	return LoadLibrary(szPath);
 }
 
 // A simple program that loads ClassicExplorer32.dll and calls the ShowExplorerSettings function
